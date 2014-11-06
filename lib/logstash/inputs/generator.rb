@@ -16,7 +16,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
 
   # The message string to use in the event.
   #
-  # If you set this to 'stdin' then this plugin will read a single line from
+  # If you set this to `stdin` then this plugin will read a single line from
   # stdin and use that as the message string for every event.
   #
   # Otherwise, this value will be used verbatim as the event message.
@@ -26,7 +26,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
   # setting.
   #
   # Example:
-  #
+  # [source,ruby]
   #     input {
   #       generator {
   #         lines => [
@@ -39,12 +39,12 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
   #       }
   #     }
   #
-  # The above will emit "line 1" then "line 2" then "line", then "line 1", etc...
+  # The above will emit `line 1` then `line 2` then `line`, then `line 1`, etc...
   config :lines, :validate => :array
 
   # Set how many messages should be generated.
   #
-  # The default, 0, means generate an unlimited number of events.
+  # The default, `0`, means generate an unlimited number of events.
   config :count, :validate => :number, :default => 0
 
   public
