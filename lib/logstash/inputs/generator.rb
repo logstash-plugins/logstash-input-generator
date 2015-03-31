@@ -49,7 +49,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
   public
   def register
     @host = Socket.gethostname
-    @count = @count.first if @count.is_a?(Array)
+    @count = Array(@count).first
   end # def register
 
   def run(queue)
@@ -85,10 +85,12 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
 
   public
   def teardown
-    @codec.flush do |event|
-      decorate(event)
-      event["host"] = @host
-      queue << event
+    if @codec.respond_to?(:flush)
+      @codec.flush do |event|
+        decorate(event)
+        event["host"] = @host
+        queue << event
+      end
     end
     finished
   end # def teardown
