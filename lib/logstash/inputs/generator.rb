@@ -1,6 +1,5 @@
 # encoding: utf-8
 require "logstash/inputs/threadable"
-require "logstash/namespace"
 require "socket" # for Socket.gethostname
 
 # Generate random log events.
@@ -46,7 +45,6 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
   # The default, `0`, means generate an unlimited number of events.
   config :count, :validate => :number, :default => 0
 
-  public
   def register
     @host = Socket.gethostname
     @count = Array(@count).first
@@ -62,7 +60,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
     end
     @lines = [@message] if @lines.nil?
 
-    while !finished? && (@count <= 0 || number < @count)
+    while !stop? && (@count <= 0 || number < @count)
       @lines.each do |line|
         @codec.decode(line.clone) do |event|
           decorate(event)
@@ -72,7 +70,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
         end
       end
       number += 1
-    end # loop
+    end
 
     if @codec.respond_to?(:flush)
       @codec.flush do |event|
@@ -81,10 +79,11 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
         queue << event
       end
     end
-  end # def run
+  end
 
-  public
-  def teardown
+  def close
+    super
+
     if @codec.respond_to?(:flush)
       @codec.flush do |event|
         decorate(event)
@@ -92,6 +91,5 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
         queue << event
       end
     end
-    finished
-  end # def teardown
-end # class LogStash::Inputs::Generator
+  end
+end
