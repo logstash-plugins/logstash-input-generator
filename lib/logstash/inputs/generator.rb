@@ -62,7 +62,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
     end
     @lines = [@message] if @lines.nil?
 
-    while !finished? && (@count <= 0 || number < @count)
+    while !stop? && (@count <= 0 || number < @count)
       @lines.each do |line|
         @codec.decode(line.clone) do |event|
           decorate(event)
@@ -92,6 +92,5 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
         queue << event
       end
     end
-    finished
   end # def teardown
 end # class LogStash::Inputs::Generator
