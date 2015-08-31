@@ -1,7 +1,11 @@
 require "logstash/devutils/rspec/spec_helper"
 require "logstash/inputs/generator"
 
-describe "inputs/generator" do
+describe LogStash::Inputs::Generator do
+
+  it_behaves_like "an interruptible input plugin" do
+    let(:config) { { } }
+  end
 
   it "should generate configured message" do
     conf = <<-CONFIG
@@ -37,7 +41,7 @@ describe "inputs/generator" do
     saved_stdin = $stdin
     stdin_mock = StringIO.new
     $stdin = stdin_mock
-    stdin_mock.should_receive(:readline).once.and_return("bar")
+    expect(stdin_mock).to receive(:readline).once.and_return("bar")
 
     events = input(conf) do |pipeline, queue|
       2.times.map{queue.pop}
