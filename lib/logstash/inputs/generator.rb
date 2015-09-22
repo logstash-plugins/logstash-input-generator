@@ -84,7 +84,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
   end # def run
 
   public
-  def teardown
+  def close
     if @codec.respond_to?(:flush)
       @codec.flush do |event|
         decorate(event)
@@ -92,5 +92,5 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
         queue << event
       end
     end
-  end # def teardown
+  end # def close
 end # class LogStash::Inputs::Generator
