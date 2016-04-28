@@ -66,8 +66,8 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
       @lines.each do |line|
         @codec.decode(line.clone) do |event|
           decorate(event)
-          event["host"] = @host
-          event["sequence"] = number
+          event.set("host", @host)
+          event.set("sequence", number)
           queue << event
         end
       end
@@ -77,7 +77,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
     if @codec.respond_to?(:flush)
       @codec.flush do |event|
         decorate(event)
-        event["host"] = @host
+        event.set("host", @host)
         queue << event
       end
     end
@@ -88,7 +88,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
     if @codec.respond_to?(:flush)
       @codec.flush do |event|
         decorate(event)
-        event["host"] = @host
+        event.set("host", @host)
         queue << event
       end
     end

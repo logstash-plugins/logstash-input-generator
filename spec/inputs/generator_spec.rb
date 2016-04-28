@@ -21,11 +21,11 @@ describe LogStash::Inputs::Generator do
       2.times.map{queue.pop}
     end
 
-    insist { events[0]["sequence"] } == 0
-    insist { events[0]["message"] } == "foo"
+    insist { events[0].get("sequence") } == 0
+    insist { events[0].get("message") } == "foo"
 
-    insist { events[1]["sequence"] } == 1
-    insist { events[1]["message"] } == "foo"
+    insist { events[1].get("sequence") } == 1
+    insist { events[1].get("message") } == "foo"
   end
 
   it "should generate message from stdin" do
@@ -47,11 +47,11 @@ describe LogStash::Inputs::Generator do
       2.times.map{queue.pop}
     end
 
-    insist { events[0]["sequence"] } == 0
-    insist { events[0]["message"] } == "bar"
+    insist { events[0].get("sequence") } == 0
+    insist { events[0].get("message") } == "bar"
 
-    insist { events[1]["sequence"] } == 1
-    insist { events[1]["message"] } == "bar"
+    insist { events[1].get("sequence") } == 1
+    insist { events[1].get("message") } == "bar"
 
     $stdin = saved_stdin
   end
