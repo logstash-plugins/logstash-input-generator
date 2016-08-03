@@ -38,7 +38,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
   #       }
   #     }
   #
-  # The above will emit `line 1` then `line 2` then `line`, then `line 1`, etc...
+  # The above will emit `line 1` then `line 2` then `line 3`, then `line 1`, etc...
   config :lines, :validate => :array
 
   # Set how many messages should be generated.
