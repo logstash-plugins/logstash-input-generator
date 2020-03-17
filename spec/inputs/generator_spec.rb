@@ -23,6 +23,8 @@ describe LogStash::Inputs::Generator do
       2.times.map{queue.pop}
     end
 
+    events = events.sort_by {|e| e.get("sequence") }
+
     insist { events[0].get("sequence") } == 0
     insist { events[0].get("message") } == "foo"
 
@@ -48,6 +50,8 @@ describe LogStash::Inputs::Generator do
     events = input(conf) do |pipeline, queue|
       2.times.map{queue.pop}
     end
+
+    events = events.sort_by {|e| e.get("sequence") }
 
     insist { events[0].get("sequence") } == 0
     insist { events[0].get("message") } == "bar"
