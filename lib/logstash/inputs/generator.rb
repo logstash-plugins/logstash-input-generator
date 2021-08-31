@@ -3,12 +3,17 @@ require "logstash/inputs/threadable"
 require "logstash/namespace"
 require "socket" # for Socket.gethostname
 
+require 'logstash/plugin_mixins/ecs_compatibility_support'
+
 # Generate random log events.
 #
 # The general intention of this is to test performance of plugins.
 #
 # An event is generated first
 class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
+
+  include LogStash::PluginMixins::ECSCompatibilitySupport(:disabled, :v1, :v8 => :v1)
+
   config_name "generator"
 
   default :codec, "plain"
@@ -50,6 +55,9 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
   def register
     @host = Socket.gethostname
     @count = Array(@count).first
+
+    @host_name_field = ecs_select[disabled: 'host', v1: '[host][name]']
+    @sequence_field = ecs_select[disabled: 'sequence', v1: '[event][sequence]']
   end # def register
 
   def run(queue)
@@ -65,32 +73,34 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
     while !stop? && (@count <= 0 || number < @count)
       @lines.each do |line|
         @codec.decode(line.clone) do |event|
-          decorate(event)
-          event.set("host", @host)
-          event.set("sequence", number)
+          decorate_and_set_fields(event, number)
           queue << event
         end
       end
       number += 1
     end # loop
 
-    if @codec.respond_to?(:flush)
-      @codec.flush do |event|
-        decorate(event)
-        event.set("host", @host)
-        queue << event
-      end
-    end
+    do_flush_codec(queue)
   end # def run
 
   public
   def close
-    if @codec.respond_to?(:flush)
-      @codec.flush do |event|
-        decorate(event)
-        event.set("host", @host)
-        queue << event
-      end
-    end
+    do_flush_codec(queue)
   end # def close
+
+  def do_flush_codec(queue)
+    return unless @codec.respond_to?(:flush)
+
+    @codec.flush do |event|
+      decorate_and_set_fields(event, nil)
+      queue << event
+    end
+  end
+
+  def decorate_and_set_fields(event, sequence)
+    decorate(event)
+    event.set(@host_name_field, @host) unless event.include?(@host_name_field)
+    event.set(@sequence_field, sequence) if sequence
+  end
+
 end # class LogStash::Inputs::Generator
