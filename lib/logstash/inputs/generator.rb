@@ -60,8 +60,9 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
     @sequence_field = ecs_select[disabled: 'sequence', v1: '[event][sequence]']
   end # def register
 
+  # @overload
   def run(queue)
-    number = 0
+    @queue = queue
 
     if @message == "stdin"
       @logger.info("Generator plugin reading a line from stdin")
@@ -70,6 +71,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
     end
     @lines = [@message] if @lines.nil?
 
+    number = 0
     while !stop? && (@count <= 0 || number < @count)
       @lines.each do |line|
         @codec.decode(line.clone) do |event|
@@ -83,10 +85,12 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
     do_flush_codec(queue)
   end # def run
 
-  public
-  def close
-    do_flush_codec(queue)
-  end # def close
+  # @overload LogStash::Inputs::Base#stop
+  def stop
+    do_flush_codec(@queue)
+  end
+
+  private
 
   def do_flush_codec(queue)
     return unless @codec.respond_to?(:flush)
