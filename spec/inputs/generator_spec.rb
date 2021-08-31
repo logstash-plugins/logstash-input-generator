@@ -1,6 +1,7 @@
 require "logstash/devutils/rspec/spec_helper"
-require "insist"
 require "logstash/devutils/rspec/shared_examples"
+require 'logstash/plugin_mixins/ecs_compatibility_support/spec_helper'
+
 require "logstash/inputs/generator"
 
 describe LogStash::Inputs::Generator do
@@ -25,11 +26,11 @@ describe LogStash::Inputs::Generator do
 
     events = events.sort_by {|e| e.get("sequence") }
 
-    insist { events[0].get("sequence") } == 0
-    insist { events[0].get("message") } == "foo"
+    expect( events[0].get("sequence") ).to eql 0
+    expect( events[0].get("message") ).to eql 'foo'
 
-    insist { events[1].get("sequence") } == 1
-    insist { events[1].get("message") } == "foo"
+    expect( events[1].get("sequence") ).to eql 1
+    expect( events[1].get("message") ).to eql 'foo'
   end
 
   it "should generate message from stdin" do
@@ -42,9 +43,7 @@ describe LogStash::Inputs::Generator do
       }
     CONFIG
 
-    saved_stdin = $stdin
-    stdin_mock = StringIO.new
-    $stdin = stdin_mock
+    $stdin = stdin_mock = StringIO.new
     expect(stdin_mock).to receive(:readline).once.and_return("bar")
 
     events = input(conf) do |pipeline, queue|
@@ -53,12 +52,13 @@ describe LogStash::Inputs::Generator do
 
     events = events.sort_by {|e| e.get("sequence") }
 
-    insist { events[0].get("sequence") } == 0
-    insist { events[0].get("message") } == "bar"
+    expect( events[0].get("sequence") ).to eql 0
+    expect( events[0].get("message") ).to eql 'bar'
 
-    insist { events[1].get("sequence") } == 1
-    insist { events[1].get("message") } == "bar"
-
-    $stdin = saved_stdin
+    expect( events[1].get("sequence") ).to eql 1
+    expect( events[1].get("message") ).to eql 'bar'
   end
+
+  after { $stdin = STDIN }
+
 end
