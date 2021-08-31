@@ -1,3 +1,7 @@
+## 3.1.0
+  - Feat: adjusted fields for ECS compatibility [#22](https://github.com/logstash-plugins/logstash-input-generator/pull/22) 
+  - Fix: codec flushing when closing input
+
 ## 3.0.6
   - Docs: Set the default_codec doc attribute.
 
