@@ -53,7 +53,7 @@ class LogStash::Inputs::Generator < LogStash::Inputs::Threadable
 
   public
   def register
-    @host = Socket.gethostname
+    @host = Socket.gethostname.freeze
     @count = Array(@count).first
 
     @host_name_field = ecs_select[disabled: 'host', v1: '[host][name]']
