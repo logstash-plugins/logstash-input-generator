@@ -34,7 +34,7 @@ This plugin uses different field names depending on whether {ecs-ref}[ECS-compat
 in enabled (see also <<plugins-{type}s-{plugin}-ecs_compatibility>>).
 
 |========
-| ECS Disabled | ECS v1 | Description
+| ECS Disabled | ECS v1, v8 | Description
 
 | `host`  | `[host][name]` | The name of the {ls} host that processed the event
 | `sequence` | `[event][sequence]` | The sequence number for the generated event
